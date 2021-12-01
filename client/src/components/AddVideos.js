@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 //On the page there must be another React component that will add a Video.
 // - It should include fields to add a
@@ -8,17 +8,22 @@ const AddVideos = (props) => {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
 };
-function addNewVideo() {}
+function addNewVideo(title, url) {
+console.log({title, url})
+}
 
 return (
   <Fragment>
-    <button onClick={addNewVideo}>Add Video</button>
+    <div className ="addVideo">
+    <button onClick={AddVideos}>Add Video</button>
     <form>
       <label>Title</label>
-      <input onChange={(e) => setTitle(e.target.value)} type="text" />
+      <input onChange={(e) => setTitle(e.target.value)} value={title} />
       <label>URL</label>
-      <input onChange={(e) => setUrl(e.target.value)} type="text" />
+      <input onChange={(e) => setUrl(e.target.value)} value={title} />
+      <button classNAME="addButton" ></button>
     </form>
+    </div>
   </Fragment>
 );
 
