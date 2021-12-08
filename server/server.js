@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 5000;
+var bodyParser = require('body-parser')
+app.use(bodyParser.json({ type: 'application/json' }))
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
@@ -76,11 +78,24 @@ app.get("/videos", (req, res) => {
 
 
 app.post("/videos", (req, res) => {
-  // const newTitle = req.body.title;
-  // const newUrl = req.body.url;
-res.send("succesful");
-console.log(req.body);
-  // res.send({newTitle,newUrl});
+  console.log(req.body)
+  const newTitle = req.body.title;
+
+  const newUrl = req.body.url;
+  const newVideo = 
+    {
+      "id": 523523,
+      "title": newTitle,
+      "url": newUrl,
+    }
+  
+    console.log(newVideo);
+
+// res.send("succesful");
+videos=videos.concat([newVideo]);
+
+  res.send(newVideo);
+  
 });
 // const addNewVideo = 
 // {
