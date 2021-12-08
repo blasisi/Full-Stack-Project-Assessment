@@ -1,20 +1,31 @@
 import React, { useState } from "react";
 import VideoCard from "./VideoCard";
-import videoData from "./videoData.json";
-// import AddVideos from from "./AddVideos";
+import AddVideos from  "./AddVideos";
 
-const YoutubeVideo = () => {
+
+// function addNewVideo(title, url) {
+//     console.log({title, url})
+
+
+
+const YoutubeVideo = ({videos}) => {
   const [vote, setVote] = useState(0);
 
-  console.log(videoData);
-  const [filterVideos, setFilterVideos] = useState(videoData);
-  const [counter, setCounter] = useState(0);
-  const cart = filterVideos.map((video) => {
-    return <VideoCard video={video}/>;
+// const filterVideos = props.videos;
 
+const [counter, setCounter] = useState(0);
+  const cards = videos.map((video) => {
+
+
+
+    return <VideoCard video={video}/>;
+    // <AddVideos addNewVideo={addNewVideo}/>;
     //two button, increase and decrese
+
+
   });
-  return <div>{cart}</div>;
+  return <div>{cards}</div>;
 };
+
 
 export default YoutubeVideo;
