@@ -1,108 +1,129 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const port = process.env.PORT || 5000;
-var bodyParser = require('body-parser')
-app.use(bodyParser.json({ type: 'application/json' }))
+const { Pool } = require("pg");
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+var bodyParser = require("body-parser");
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use(cors());
+app.listen(port, () => 
+console.log(`Listening on port ${port}`)
+);
 
 // Store and retrieve your videos from here
 // If you want, you can copy "exampleresponse.json" into here to have some data to work with
-let videos =[
-  {
-    "id": 523523,
-    "title": "Never Gonna Give You Up",
-    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    "rating": 23
+//https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1
+
+//connection to database server
+const pool = new Pool({
+  connectionString:
+    "postgres://lmrcgpxpyqlfsh:308202d17a9736419863ea16d4265ceda44ba92e08bdbea24c99f80247c82f35@ec2-54-229-68-88.eu-west-1.compute.amazonaws.com:5432/d6seo1quc578dv",
+  ssl: {
+    rejectUnauthorized: false,
   },
-  {
-    "id": 523427,
-    "title": "The Coding Train",
-    "url": "https://www.youtube.com/watch?v=HerCR8bw_GE",
-    "rating": 230
-  },
-  {
-    "id": 82653,
-    "title": "Mac & Cheese | Basics with Babish",
-    "url": "https://www.youtube.com/watch?v=FUeyrEN14Rk",
-    "rating": 2111
-  },
-  {
-    "id": 858566,
-    "title": "Videos for Cats to Watch - 8 Hour Bird Bonanza",
-    "url": "https://www.youtube.com/watch?v=xbs7FT7dXYc",
-    "rating": 11
-  },
-  {
-    "id": 453538,
-    "title": "The Complete London 2012 Opening Ceremony | London 2012 Olympic Games",
-    "url": "https://www.youtube.com/watch?v=4As0e4de-rI",
-    "rating": 3211
-  },
-  {
-    "id": 283634,
-    "title": "Learn Unity - Beginner's Game Development Course",
-    "url": "https://www.youtube.com/watch?v=gB1F9G0JXOo",
-    "rating": 211
-  },
-  {
-    "id": 562824,
-    "title": "Cracking Enigma in 2021 - Computerphile",
-    "url": "https://www.youtube.com/watch?v=RzWB5jL5RX0",
-    "rating": 111
-  },
-  {
-    "id": 442452,
-    "title": "Coding Adventure: Chess AI",
-    "url": "https://www.youtube.com/watch?v=U4ogK0MIzqk",
-    "rating": 671
-  },
-  {
-    "id": 536363,
-    "title": "Coding Adventure: Ant and Slime Simulations",
-    "url": "https://www.youtube.com/watch?v=X-iSQQgOd1A",
-    "rating": 76
-  },
-  {
-    "id": 323445,
-    "title": "Why the Tour de France is so brutal",
-    "url": "https://www.youtube.com/watch?v=ZacOS8NBK6U",
-    "rating": 73
-  }
-]
-// GET "/"
-app.get("/videos", (req, res) => {
-  // Delete this line after you've confirmed your server is running
-  res.send(videos);
+  user: "lmrcgpxpyqlfsh",
+  host: "ec2-54-229-68-88.eu-west-1.compute.amazonaws.com",
+  database: "d6seo1quc578dv",
+  password: "308202d17a9736419863ea16d4265ceda44ba92e08bdbea24c99f80247c82f35",
+  port: "5432",
 });
 
-
-app.post("/videos", (req, res) => {
-  console.log(req.body)
-  const newTitle = req.body.title;
-
-  const newUrl = req.body.url;
-  const newVideo = 
-    {
-      "id": 523523,
-      "title": newTitle,
-      "url": newUrl,
-    }
-  
-    console.log(newVideo);
-
-// res.send("succesful");
-videos=videos.concat([newVideo]);
-
-  res.send(newVideo);
-  
+// GET "/" all videos "
+app.get("/", (req, res) => {
+  // Delete this line after you've confirmed your server is running 
+    pool.query(`SELECT * from videos`)
+    .then((result) =>{
+          res.send(result.rows);
+        })
+        .catch((error) =>res.status(500).send(error));
 });
-// const addNewVideo = 
-// {
-//   "title": "music video",
-//   "url": ""
+
+// //This endpoint is used to add a video to the API.
+// // app.post("/videos", (req, res) => {
+//   app.get("/", (req,res) =>{
+// const order = req.query.order;
+// if(order){
+//   pool.query(`SELECT * from videos ORDER by rating ${order}`)
+//   .then((result) =>{
+//     res.join(result.rows);
+//   })
+//   .catch((error) =>res.status(500).send(error));
+// }else{
+//   pool.query(`SELECT * from videos desc`)
+//   .then((result) =>{
+//     res.send(results.rows);
+//   })
+//   .catch((error) =>res.status(500).send(error));
 // }
-// app.get("/", (req, res) => {
+// });
+// //get video by | return the video with the ID contained within the `{id}` parameter 
+// app.get("/:id", (req,res) =>{
+// const videoById = req.params.id
+// console.log(videoById);
+// pool.query(`SELECT * from videos WHERE lower (title) like '%${id}'`, [id,
+// ])
+// .then((result) =>{
+//   res.json(result.rows);
+//   console.log(rows);
+// })
+// .catch((error) => res.send(error));
+// });
+
+
+//Create a new video. This endpoint is use to add a video to the API
+app.post("/", (request, response) => {
+  const title = request.body.title;
+  const url = request.body.url;
+  if (
+    !title ||
+    !url 
+  ) {
+    return response.status(400).send({
+      result: "failure",
+      message: "Video could not be saved",
+    });
+  }
+  const newVideo = {
+    title: title,
+    url: url,
+    rating: 0,
+  };
+  const selectQuery = `INSERT INTO videos (title, url,rating) VALUES ('${newVideo.title}','${newVideo.url}',${newVideo.rating}) RETURNING id;`;
+  pool.query(selectQuery, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .send({ msg: "Err" });
+    }
+    if (error) {
+      response.send(error);
+    }
+    response.send("video added to the database");
+  });
+});
+
+
+// Update rating put end point
+app.put("/:id", (req, res) => {
+  const videoById = req.params.id;
+  const newRating = req.body.rating;
+  pool .query (`update videos set rating=$1 WHERE id=$2`, [newRating, videoById])
+.then(res.json({ rating: newRating}))
+.catch((error) => res.send(error));
+});
+
+// Delete video specific by ID
+app.delete("/:id", (req, res) => {
+  const videoById = +req.params.id;
+  pool .query (`delete from videos WHERE id=$1`, [videoById])
+  .then(res.send( "video has been deleted "))
+  .catch((error) => res.send(error));
+}
+);
+
 //   // Delete this line after you've confirmed your server is running
 //   res.send({ express: "Your Backend Service is Running" });
 // });
